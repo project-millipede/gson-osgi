@@ -1,0 +1,6 @@
+Bundle-Developers:
+Bundle-DocURL:
+Bundle-License:
+Bundle-SCM:
+
+-include: ${project.rootdir}/bnd/${project.artifactId}.bnd
