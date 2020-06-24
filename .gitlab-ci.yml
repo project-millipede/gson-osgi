@@ -18,7 +18,7 @@ build_feature:
   stage: build
   script:
     - git submodule foreach 'git fetch origin; git checkout $(git describe --tags `git rev-list --tags --max-count=1`);'
-    - GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
+    - export GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
     - mvn ${MAVEN_MODIFY_CLI_OPTS} clean install -f pom-modify.xml
     - mvn ${MAVEN_CLI_OPTS} clean install
   except:
@@ -29,7 +29,7 @@ deploy_artifacts:
   stage: deploy
   script:
     - git submodule foreach 'git fetch origin; git checkout $(git describe --tags `git rev-list --tags --max-count=1`);'
-    - GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
+    - export GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
     - mvn ${MAVEN_MODIFY_CLI_OPTS} clean install -f pom-modify.xml
     - mvn ${MAVEN_CLI_OPTS} clean install deploy
   only:
