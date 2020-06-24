@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson-osgi-modify</artifactId>
+    <version>${gson.version}</version>
+
+    <packaging>pom</packaging>
+
+    <name>GSON :: OSGi :: Modify</name>
+
+    <properties>
+        <artifactId-modifier>gson-osgi</artifactId-modifier>
+        <pomFile-to-alter>gson/pom.xml</pomFile-to-alter>
+        <pomutils-maven-plugin.version>1.1.0</pomutils-maven-plugin.version>
+
+        <!-- Parent from original project -->
+        <parent.groupId>org.sonatype.oss</parent.groupId>
+        <parent.artifactId>oss-parent</parent.artifactId>
+        <parent.version>7</parent.version>
+
+        <pomFile-template-to-alter>pom.xml</pomFile-template-to-alter>
+
+        <!--
+        Version derived from the original GSON project, which is integrated as a Git submodule.
+        The version gets automatically determined using maven evaluation.
+        export GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
+        -->
+        <gson.version>0.0.0</gson.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>info.bluespot</groupId>
+                    <artifactId>pomutils-maven-plugin</artifactId>
+                    <version>${pomutils-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>add-a-parent</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>add-parent</goal>
+                            </goals>
+                            <configuration>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${artifactId-modifier}</artifactId>
+                                <version>${gson.version}</version>
+                                <pomFile>${pomFile-to-alter}</pomFile>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-a-custom-parent</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>add-parent</goal>
+                            </goals>
+                            <configuration>
+                                <groupId>${parent.groupId}</groupId>
+                                <artifactId>${parent.artifactId}</artifactId>
+                                <version>${parent.version}</version>
+                                <pomFile>${pomFile-template-to-alter}</pomFile>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>modify-project</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>modify-project</goal>
+                            </goals>
+                            <configuration>
+                                <version>${gson.version}</version>
+                                <pomFile>${pomFile-template-to-alter}</pomFile>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>info.bluespot</groupId>
+                <artifactId>pomutils-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

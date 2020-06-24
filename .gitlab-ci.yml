@@ -1,0 +1,37 @@
+image: maven:3.6.3-jdk-11
+
+variables:
+  GIT_SUBMODULE_STRATEGY: normal
+  MAVEN_MODIFY_CLI_OPTS: "-s settings-modify.xml"
+  MAVEN_CLI_OPTS: "-s settings.xml"
+
+cache:
+  paths:
+    - ~/.m2/repository
+    - target/
+
+stages:
+  - build
+  - deploy
+
+build_feature:
+  stage: build
+  script:
+    - git submodule foreach 'git fetch origin; git checkout $(git describe --tags `git rev-list --tags --max-count=1`);'
+    - GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
+    - mvn ${MAVEN_MODIFY_CLI_OPTS} clean install -f pom-modify.xml
+    - mvn ${MAVEN_CLI_OPTS} clean install
+  except:
+    refs:
+      - master
+
+deploy_artifacts:
+  stage: deploy
+  script:
+    - git submodule foreach 'git fetch origin; git checkout $(git describe --tags `git rev-list --tags --max-count=1`);'
+    - GSON_VERSION=$(mvn help:evaluate -f gson/pom.xml -Dexpression=project.version -q -DforceStdout)
+    - mvn ${MAVEN_MODIFY_CLI_OPTS} clean install -f pom-modify.xml
+    - mvn ${MAVEN_CLI_OPTS} clean install deploy
+  only:
+    refs:
+      - master
